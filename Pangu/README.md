@@ -41,6 +41,6 @@ pip install ai-models-panguweather
 https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models 에 나온 onnx 파일들도 다운 받는다.
 
 ## ERA5_download.py
-원하는 ERA5 시간 데이터를 Pangu input 형식에 맞게 변형, 각 변수들은 Pangu Git([[https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models|Pangu Git]])
+원하는 ERA5 시간 데이터를 Pangu input 형식에 맞게 변형, 각 변수들은 [Pangu Git](https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models)
 
 

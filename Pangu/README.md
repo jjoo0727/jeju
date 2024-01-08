@@ -33,5 +33,5 @@ CUDA가 굉장히 크므로 아직 다루지 않았음
 pip install -r requirements_gpu.txt
 ```
 
-[https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models]에 나온 onnx 파일들도 다운 받는다.
+[https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models] 에 나온 onnx 파일들도 다운 받는다.
 

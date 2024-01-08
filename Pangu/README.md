@@ -1,4 +1,5 @@
 # Pangu Weather
+```
 ├── root
 │   ├── input_data
 │   │   ├── input_surface.npy
@@ -11,3 +12,4 @@
 │   ├── inference_cpu.py
 │   ├── inference_gpu.py
 │   ├── inference_iterative.py
+```

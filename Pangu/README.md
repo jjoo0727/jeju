@@ -26,3 +26,12 @@ cpu 이용시 cmd나 prompt에 다음을 입력(requirements_cpu.txt의 위치�
 ```
 pip install -r requirements_cpu.txt
 ```
+
+GPU 이용시 CUDA 11.6 버전 및 cudnn 8.5.0.96 버전을 설치하고 다음을 실행
+CUDA가 굉장히 크므로 아직 다루지 않았음
+```
+pip install -r requirements_gpu.txt
+```
+
+[https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models]에 나온 onnx 파일들도 다운 받는다.
+

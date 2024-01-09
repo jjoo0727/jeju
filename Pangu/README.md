@@ -19,7 +19,6 @@
 │   ├── inference_cpu.py
 │   ├── inference_gpu.py
 │   ├── inference_iterative.py
-│   ├── ERA5_download.py
 ```
 
 cpu 이용시 cmd나 prompt에 다음을 입력(requirements_cpu.txt의 위치에서 실행해야 함)

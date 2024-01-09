@@ -51,7 +51,7 @@ time_str = 'YYYY.MM.DD HHUTC'
 
 ## inference_cpu.py, inference_iterative.py
 time_str, predict_interval을 조정하여 초기장 시각과 예측 시간(1,3,6,24 중) 조정
-inference_iterative.py에서는 예측 시간을 조합하여 더 먼 미래의 예측장 도출
+<br/>inference_iterative.py에서는 예측 시간을 조합하여 더 먼 미래의 예측장 도출
 
 ## plotting.py
 time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정

@@ -42,6 +42,7 @@ pip install ai-models-panguweather
 
 ## ERA5_download.py
 원하는 ERA5 시간 데이터를 Pangu input 형식에 맞게 변형하는 코드 
+<br/> ERA5 개인 url, key 필요
 <br/> 각 변수들은 [Pangu Git](https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models)의 설명을 참조하라.
 ```python
 time_str = 'YYYY.MM.DD HHUTC'

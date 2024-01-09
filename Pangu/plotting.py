@@ -31,19 +31,20 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
 
 
 
-predict_interval_list = np.arange(0,24*7+1,24)[1:]
-time_str = '2018.09.30 00UTC'
-plt.rcParams['font.family'] = 'Arial'
+predict_interval_list = np.arange(0,24*7+1,24)[1:]  #볼 예측 시간 지정
+time_str = '2018.09.30 00UTC'                       #time_str 지정
 proj = ccrs.PlateCarree(central_longitude=180)
 original_cmap = plt.get_cmap("BrBG")
-truncated_BrBG = truncate_colormap(original_cmap, minval=0.35, maxval=1.0)
+truncated_BrBG = truncate_colormap(original_cmap, minval=0.35, maxval=1.0) #수증기 colormap 지정
 
-# input_data_dir = rf'C:\Users\jjoo0\2023c\Pangu-Weather\output_data\{time_str}'
+proj = ccrs.PlateCarree(central_longitude=180)  # Set central_longitude to 180
+#위경도 범위 지정
+#동반구는 0~180, 서반구는 180~360
+lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(0,360,-90,90)  
 
-# # Load surface data
-# surface = np.load(os.path.join(input_data_dir, rf'input_surface_{time_str}.npy')).astype(np.float32) 
-# surface_factor = ['MSLP', 'U10', 'V10', 'T2M']
-  # Set central_longitude to 180
+pres_list = ['1000','925','850','700','600','500','400','300','250','200','150','100','50']
+pres=500                                            #살펴볼 기압면 결정
+p=pres_list.index(str(pres))
 
 
 for predict_interval in predict_interval_list:
@@ -51,11 +52,8 @@ for predict_interval in predict_interval_list:
     
     # Load surface data
     surface = np.load(os.path.join(output_data_dir, rf'surface\{predict_interval}h.npy')).astype(np.float32) 
-    
     surface_factor = ['MSLP', 'U10', 'V10', 'T2M']
-    lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(0,360,-90,90)                    #동반구는 0~180, 서반구는 180~360
-    proj = ccrs.PlateCarree(central_longitude=180)  # Set central_longitude to 180
-    
+
 
     fig, axs = plt.subplots(2, 2, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
     fig.suptitle(f'{time_str} Surface (+{predict_interval}h)', fontsize=36, weight='bold')
@@ -92,15 +90,12 @@ for predict_interval in predict_interval_list:
         else:
             cbar.set_label('Temperature (K)' if i == 3 else 'Wind Speed (m/s)', fontsize=20)
     
-    # Adjust the layout
+
     plt.tight_layout()
-    
-    # Show the plot
     plt.show()
     
     
     #wind vector map
-    
     skip_step = 4   #skip_step이 클수록 표시되는 바람 벡터 감소
     u10 = surface[1][lat_start:lat_end + 1, lon_start:lon_end + 1][::skip_step, ::skip_step]
     v10 = surface[2][lat_start:lat_end + 1, lon_start:lon_end + 1][::skip_step, ::skip_step]
@@ -122,23 +117,17 @@ for predict_interval in predict_interval_list:
     plt.show()
     
     
-    # Load upper data
+    # upper level 그리기
     upper = np.load(os.path.join(output_data_dir, rf'upper\{predict_interval}h.npy')).astype(np.float32) 
     upper_factor = ['Z', 'Q', 'T', 'U','V']
     upper_unit   = ['$m$', '$g/kg$', '$K$', '$m/s$', '$m/s$'] 
-    pres_list = ['1000','925','850','700','600','500','400','300','250','200','150','100','50']
     
 
     # Create a figure and axis with a PlateCarree projection
     proj = ccrs.PlateCarree(central_longitude=180)
+    
     lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(110,160,5,45)
-    
-    #살펴볼 기압면 결정
-    # pres=1000
-    pres=500
-    p=pres_list.index(str(pres))
-    
-    
+
     fig, axs = plt.subplots(2, 3, figsize=(12*latlon_ratio*3/2, 12), subplot_kw={'projection': proj})
     fig.suptitle(f'{time_str} {pres}hPa (+{predict_interval}h)', fontsize=36, weight='bold')
     
@@ -156,7 +145,7 @@ for predict_interval in predict_interval_list:
             im = ax.imshow(draw*1000, cmap=truncated_BrBG, extent = extent,transform=proj)
         else:
             im = ax.imshow(draw, cmap='jet', extent = extent,transform=proj)
-        # ax.set_extent(extent, crs=proj)
+
     
         # Add coastlines and gridlines
         ax.coastlines()
@@ -177,10 +166,7 @@ for predict_interval in predict_interval_list:
         cbar.set_label(f'{upper_unit[i]}', fontsize=20)
     
     fig.delaxes(axs[1][2])  #6번째 그림 없애기, 여기에 벡터 그림 추가하면 될 듯
-    # Adjust the layout
     plt.tight_layout()
-    
-    # Show the plot
     plt.show()
 
 

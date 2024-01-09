@@ -44,13 +44,18 @@ pip install ai-models-panguweather
 원하는 ERA5 시간 데이터를 Pangu input 형식에 맞게 변형하는 코드 
 <br/> ERA5 개인 url, key 필요
 <br/> 각 변수들은 [Pangu Git](https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models)의 설명을 참조하라.
+<br/> 시간대 조정은 다음과 같이 한다.
 ```python
 time_str = 'YYYY.MM.DD HHUTC'
 ```
 
 ## inference_cpu.py, inference_iterative.py
-**cpu, dfa**
->asdfasdfasdf
->asdfasdfasdf
+time_str, predict_interval을 조정하여 초기장 시각과 예측 시간(1,3,6,24 중) 조정
+inference_iterative.py에서는 예측 시간을 조합하여 더 먼 미래의 예측장 도출
+
+## plotting.py
+time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정
+<br/>latlon_extent(0,360,-90,90)에서 살펴볼 위경도 범위 조정
+<br/>pres로 기압면 결정정
 
 

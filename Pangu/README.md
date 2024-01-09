@@ -59,7 +59,9 @@ pres로 기압면 결정정
 
 
 
-  이미지 예시
+
+      
+이미지 예시
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/9dbac0d2-23b2-4d7e-9871-b21830442bb4)
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/f3971dc9-caa8-4c04-a992-e6dac09571b3)
 

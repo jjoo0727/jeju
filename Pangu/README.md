@@ -53,10 +53,13 @@ time_str, predict_interval을 조정하여 초기장 시각과 예측 시간(1,3
 <br/>inference_iterative.py에서는 예측 시간을 조합하여 더 먼 미래의 예측장 도출
 
 ## plotting.py
-time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정
-<br/>latlon_extent(0,360,-90,90)에서 살펴볼 위경도 범위 조정  
+time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정  
+latlon_extent(0,360,-90,90)에서 살펴볼 위경도 범위 조정  
 pres로 기압면 결정정
 
+
+
+  이미지 예시
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/9dbac0d2-23b2-4d7e-9871-b21830442bb4)
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/f3971dc9-caa8-4c04-a992-e6dac09571b3)
 

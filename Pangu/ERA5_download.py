@@ -35,8 +35,8 @@ def download_era5_surface(year, month, day, time, area, file_path):
 
 def download_era5_upper(year, month, day, time, area, file_path):
     c = cdsapi.Client(
-        url="https://cds.climate.copernicus.eu/api/v2",
-        key="65047:f1c3f20d-b7ef-43c6-9a7c-540e8651e7fa")
+        url="https://cds.climate.copernicus.eu/api/v2",     
+        key="65047:f1c3f20d-b7ef-43c6-9a7c-540e8651e7fa")   #개인 키이므로 
     c.retrieve(
         'reanalysis-era5-pressure-levels',
         {
@@ -60,7 +60,7 @@ def download_era5_upper(year, month, day, time, area, file_path):
 
 
 
-# Example time parameter
+# 'YYYY.MM.DD HHUTC' 형식으로 적으면 됩니다!
 time_str = '2018.09.30 00UTC'
 
 # Parse the time string using datetime

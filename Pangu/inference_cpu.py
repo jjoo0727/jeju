@@ -7,15 +7,22 @@ import time
 start = time.time()
 
 # The directory of your input and output data
-predict_interval = 24
-for predict_interval in [1,3,6,24]:
-    time_str = '2018.09.30 00UTC'
-    pangu_dir = r'C:\Users\jjoo0\2023c\Pangu-Weather'
-    input_data_dir = rf'{pangu_dir}\input_data'
-    output_data_dir = rf'{pangu_dir}\output_data'
-    model_dir = rf'{pangu_dir}\pangu_weather_{predict_interval}.onnx'
-    model = onnx.load(model_dir)
-    
+predict_interval = 24                               #예측할 시간 지정(1,3,6,24) 가능
+time_str = '2018.09.30 00UTC'                       #time_str을 조정해서 초기 시간 조정
+pangu_dir = r'C:\Users\jjoo0\2023c\Pangu-Weather'   #각자 데스크톱에서 PANGU Weather 폴더 위치
+input_data_dir = rf'{pangu_dir}\input_data'
+output_data_dir = rf'{pangu_dir}\output_data'
+model_dir = rf'{pangu_dir}\pangu_weather_{predict_interval}.onnx'
+model = onnx.load(model_dir)
+
+# 디렉토리 확인 및 생성
+if not os.path.exists(rf'{output_data_dir}\upper'):
+    os.makedirs(rf'{output_data_dir}\upper')
+if not os.path.exists(rf'{output_data_dir}\surface'):
+    os.makedirs(rf'{output_data_dir}\surface')
+
+for predict_interval in [1,3,6,24]:                 #1,3,6,24시간 예측, 하나만 필요하면 for문 해제
+
     # Set the behavier of onnxruntime
     options = ort.SessionOptions()
     options.enable_cpu_mem_arena=False

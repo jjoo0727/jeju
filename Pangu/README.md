@@ -45,5 +45,7 @@ pip install ai-models-panguweather
 
 ## inference_cpu.py, inference_iterative.py
 **cpu, dfa**
+>asdfasdfasdf
+>asdfasdfasdf
 
 

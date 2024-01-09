@@ -28,7 +28,7 @@ pip install -r requirements_cpu.txt
 ```
 
 GPU 이용시 CUDA 11.6 버전, Linux이면 8.2.4 버전, Window이면 cudnn 8.5.0.96 버전을 설치하고 다음을 실행
-(CUDA가 굉장히 크므로 아직 다루지 않았음)
+<br/>(CUDA가 굉장히 크므로 아직 다루지 않았음)
 ```
 pip install -r requirements_gpu.txt
 ```

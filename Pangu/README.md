@@ -45,7 +45,8 @@ pip install ai-models-panguweather
 <br/> 각 변수들은 [Pangu Git](https://github.com/198808xc/Pangu-Weather?tab=readme-ov-file#downloading-trained-models)의 설명을 참조하라.
 ```python
 time_str = 'YYYY.MM.DD HHUTC'
-'''
+```
+
 ## inference_cpu.py, inference_iterative.py
 **cpu, dfa**
 >asdfasdfasdf

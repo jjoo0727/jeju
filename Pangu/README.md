@@ -55,7 +55,8 @@ time_str, predict_interval을 조정하여 초기장 시각과 예측 시간(1,3
 ## plotting.py
 time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정  
 latlon_extent(0,360,-90,90)에서 살펴볼 위경도 범위 조정  
-pres로 기압면 결정정
+pres로 기압면 결정정  
+***wind vector map 범례 표시 위치가 이상하게 표기됨 어떻게 해결해야할지??***
 
 
 

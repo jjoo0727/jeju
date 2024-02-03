@@ -3,11 +3,11 @@
 ```
 ├── root
 │   ├── input_data
-│   │   ├── YYYY.MM.DD HHUTC
+│   │   ├── YYYY.MM.DD HHUTC(multi_time의 경우 YYYY-MM-DD-HHUTC로 구성)
 │   │   │   ├── surface.npy
 │   │   │   ├── upper.npy
 │   ├── output_data
-│   │   ├── YYYY.MM.DD HHUTC
+│   │   ├── YYYY.MM.DD HHUTC(multi_time의 경우 YYYY-MM-DD-HHUTC로 구성)
 │   │   │   ├── surface
 │   │   │   │   ├── HHHh.npy
 │   │   │   ├── upper

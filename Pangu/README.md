@@ -93,11 +93,15 @@ du_dy = np.empty_like(u)
 du_dy[1:-1, :] = (u[:-2, :] - u[2:, :]) / (2 * delta_lat[1:-1, :])
 du_dy[0, :] = du_dy[-1, :] = np.nan
 ```
-
-
-**현재 육상에 올라가면 정확한 위치 추적 힘듦**
+![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/5a56867b-60a6-4ab7-9a98-0bfc666e5365)
 ![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f)
 
+**현재 육상에 올라가면 정확한 위치 추적 힘듦**
+
+ㅁㄴㅇㄻ|ㅁㄴㅇㄻㄴㅇㄹ|
+ㅁㄴㅇㄻ|ㅁㄴㅇㄻㄴㅇㄹ|
+이미지링크 | 이미지링크
+---|---|
 
       
 

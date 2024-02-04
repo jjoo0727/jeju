@@ -88,12 +88,12 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
     # 데이터의 복사본 생성 및 마스킹
     data_copy = np.copy(data)
     wind_mask = wind_speed > 10         # wind_speed > 10인 조건을 만족하는 픽셀에 대한 마스크 생성
-    expanded_wind_mask = binary_dilation(wind_mask, structure=np.ones((5, 5)))  # wind_mask의 주변 1픽셀 확장
-    data_copy[~expanded_wind_mask] = np.nan # 확장된 마스크를 사용하여 wind_speed > 10 조건과 그 주변 1픽셀 이외의 위치를 NaN으로 설정
+    expanded_wind_mask = binary_dilation(wind_mask, structure=np.ones((5, 5)))  # wind_mask의 주변 2픽셀 확장
+    data_copy[~expanded_wind_mask] = np.nan # 확장된 마스크를 사용하여 wind_speed > 10 조건과 그 주변 2픽셀 이외의 위치를 NaN으로 설정
     
     if len(min_position) < 1:
-        data_copy[(lat_grid > (init_pos[0]+init_size))|(lat_grid < (init_pos[0]-init_size))] = np.nan   # 복사본에서 위도가 35도 초과하는 값을 NaN으로 설정
-        data_copy[(lon_grid > (init_pos[1]+init_size-180))|(lon_grid < (init_pos[1]-init_size-180))] = np.nan   # 복사본에서 위도가 35도 초과하는 값을 NaN으로 설정
+        data_copy[(lat_grid > (init_pos[0]+init_size))|(lat_grid < (init_pos[0]-init_size))] = np.nan   
+        data_copy[(lon_grid > (init_pos[1]+init_size-180))|(lon_grid < (init_pos[1]-init_size-180))] = np.nan 
     
     
     if pred_str > init_str and min_position:
@@ -108,20 +108,19 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
 
     if np.isnan(data_copy).all():
         print("모든 값이 NaN입니다. 유효한 최소값이 없습니다.")
-        return np.nan, np.nan, min_position
-
-    # 최소값 찾기
-    min_index = np.unravel_index(np.nanargmin(data_copy), data_copy.shape)
-    min_value = np.nanmin(data_copy)
-    min_lat = lat_indices[lat_start + min_index[0]]
-    min_lon = lon_indices[lon_start + min_index[1]]
+    else:
+        # 최소값 찾기
+        min_index = np.unravel_index(np.nanargmin(data_copy), data_copy.shape)
+        min_value = np.nanmin(data_copy)
+        min_lat = lat_indices[lat_start + min_index[0]]
+        min_lon = lon_indices[lon_start + min_index[1]]
+        min_position.append([min_lon, min_lat, min_index, pred_str.strftime("%Y/%m/%d/%HUTC"), min_value])
 
 
     ax.text(min_lon, min_lat, f'{min_value/100:.0f}hPa', transform=ax.projection, color='red', 
             horizontalalignment='center', verticalalignment='bottom', fontsize=20, fontweight='bold')
     
     norm_p = mcolors.Normalize(vmin=950, vmax=1020)
-    min_position.append([min_lon, min_lat, min_index, pred_str.strftime("%Y/%m/%d/%HUTC"), min_value])
     
     for i, (lon, lat, idx, p_str, min_pres) in enumerate(min_position):
         # 선으로 연결

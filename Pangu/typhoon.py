@@ -53,14 +53,23 @@ def calculate_vorticity(u, v, lat_grid, lon_grid):
 
     # Pre-calculate deltas for longitude and latitude
     delta_lon = 0.25 * deg_to_rad * earth_radius * np.cos(lat_grid * deg_to_rad)
-    delta_lat = 0.25 * deg_to_rad * earth_radius
+    delta_lat = 0.25 * deg_to_rad * earth_radius * np.ones_like(lat_grid)
 
-    # Calculate partial derivatives using central differences
-    dv_dx = (np.roll(v, -1, axis=1) - np.roll(v, 1, axis=1)) / (2 * delta_lon)
-    du_dy = (np.roll(u, -1, axis=0) - np.roll(u, 1, axis=0)) / (2 * delta_lat)
 
-    # Calculate vorticity
-    vorticity = dv_dx - du_dy
+    # Initialize vorticity array with nan values
+    vorticity = np.full_like(u, np.nan)
+
+    # Calculate partial derivatives using slicing, avoiding boundaries
+    dv_dx = np.empty_like(v)
+    dv_dx[:, 1:-1] = (v[:, 2:] - v[:, :-2]) / (2 * delta_lon[:, 1:-1])
+    dv_dx[:, 0] = dv_dx[:, -1] = np.nan
+
+    du_dy = np.empty_like(u)
+    du_dy[1:-1, :] = (u[:-2, :] - u[2:, :]) / (2 * delta_lat[1:-1, :])
+    du_dy[0, :] = du_dy[-1, :] = np.nan
+
+    # Calculate vorticity avoiding boundaries
+    vorticity[1:-1, 1:-1] = dv_dx[1:-1, 1:-1] - du_dy[1:-1, 1:-1]
 
     return vorticity
 
@@ -134,7 +143,6 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
     lons = [pos[0] for pos in min_position]
     lats = [pos[1] for pos in min_position]
     min_values = [pos[4]/100 for pos in min_position]
-    print(min_values)
     
     min_p = ax.scatter(lons, lats, c=min_values, cmap='jet_r', norm=norm_p, transform=proj, zorder=2)
     cbar_min_p = plt.colorbar(min_p, orientation='horizontal', fraction=0.046, pad=0.07)
@@ -166,7 +174,7 @@ def weather_map_contour(ax, lon_grid, lat_grid, data):
     ax.clabel(cs_bold, cs_bold.levels, inline=True, fontsize=10)
     
 
-def process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end):
+def process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end, lat_grid, lon_grid):
     
     # Extract surface variables
     mslp = surface[surface_dict['MSLP']][lat_start:lat_end + 1, lon_start:lon_end + 1]
@@ -181,7 +189,11 @@ def process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_st
     # Calculate 10-meter wind speed
     wind_speed = np.sqrt(u10**2 + v10**2)
     
-    return mslp, wind_speed, z_diff
+    u_850 = upper[upper_dict['u'], 2, :, :][lat_start:lat_end + 1, lon_start:lon_end + 1]
+    v_850 = upper[upper_dict['v'], 2, :, :][lat_start:lat_end + 1, lon_start:lon_end + 1]
+    vorticity = calculate_vorticity(u_850, v_850, lat_grid, lon_grid)
+    
+    return mslp, wind_speed, z_diff, vorticity
 #%%
 proj = ccrs.PlateCarree(central_longitude=180)
 original_cmap = plt.get_cmap("BrBG")
@@ -213,6 +225,7 @@ init_pos = [14.06, 135.71]                          #태풍 첫 위경도
 
 
 for y, m, d, tm in itertools.product(year, month, day, times):
+    print(time_str)
     time_str = f'{y}/{m}/{d}/{tm}UTC'
     input_data_dir = rf'{pangu_dir}/input_data/{time_str}'
 
@@ -223,11 +236,10 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     min_position = []  # 최저값 위치를 저장할 리스트
 
 
-
     predict_str = time_str
     surface = np.load(os.path.join(input_data_dir, 'surface.npy')).astype(np.float32)  
     upper = np.load(os.path.join(input_data_dir, 'upper.npy')).astype(np.float32)  
-    mslp, wind_speed, z_diff = process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end)
+    mslp, wind_speed, z_diff, vorticity = process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end, lat_grid, lon_grid)
     
     
     fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
@@ -237,17 +249,20 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     setup_map(ax)
     weather_map_contour(ax, lon_grid, lat_grid, mslp)
 
-    # contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4,10**-4,21),extend='both')
-    contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet', levels = np.linspace(10000,11500,16), alpha=0.5)
+    contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4*5,10**-4*5,21),extend='both')
+    # contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet', levels = np.linspace(10000,11500,16), alpha=0.5)
     # contourf = ax.contourf(lon_grid, lat_grid, wind_speed, cmap='jet', levels = np.linspace(0,30,7), alpha=0.5)
+    
     cbar = plt.colorbar(contourf, ax=ax, orientation='horizontal', extend='both', fraction=0.046, pad=0.04)
-    # cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
-    cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
+    cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
+    # cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
     # cbar.set_label('10m Wind Speed(m/s)', fontsize=16)  # You can customize the label here
+    
     if not os.path.exists(f'{pangu_dir}/plot/typhoon/{time_str}'):
         os.makedirs(f'{pangu_dir}/plot/typhoon/{time_str}')
     plt.close(fig)
-    fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/0h.png')
+    fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/0h_vc.png')
+
 
     for predict_interval in predict_interval_list:
 
@@ -259,7 +274,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         # Load surface data
         surface = np.load(os.path.join(output_data_dir, rf'surface/{predict_interval}h.npy')).astype(np.float32)
         upper = np.load(os.path.join(output_data_dir, rf'upper/{predict_interval}h.npy')).astype(np.float32)
-        mslp, wind_speed, z_diff = process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end)
+        mslp, wind_speed, z_diff, vorticity = process_meteorological_data(surface, surface_dict, upper, upper_dict, lat_start, lat_end, lon_start, lon_end, lat_grid, lon_grid)
         
         fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
         ax.set_title(f'{time_str} (+{predict_interval}h)  predict: {predict_str}', fontsize=20)
@@ -268,140 +283,19 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         setup_map(ax)
         weather_map_contour(ax, lon_grid, lat_grid, mslp)
 
-        # contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4,10**-4,21),extend='both')
+        contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4*5,10**-4*5,21),extend='both')
         # contourf = ax.contourf(lon_grid, lat_grid, wind_speed, cmap='jet', levels = np.linspace(0,30,7), alpha=0.5)
-        contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet', levels = np.linspace(10000,11500,16), alpha=0.5)
+        # contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet', levels = np.linspace(10000,11500,16), alpha=0.5)
         cbar = plt.colorbar(contourf, ax=ax, orientation='horizontal', extend='both', fraction=0.046, pad=0.04)
-        # cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
-        cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
+        cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
+        # cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
         # cbar.set_label('10m Wind Speed(m/s)', fontsize=16)  # You can customize the label here
-        fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/{predict_interval}h.png')
-
-#%% multi time
-predict_interval_list = np.arange(0,24*7+1,6)[1:]  #볼 예측 시간 지정
-year = ['2022']
-month = ['08']
-day = ['26','27']
-times = ['00','06','12','18']
-pred_str = '2022.09.01 00UTC'
-area = [90, 0, -90, 360]
-time_str_input = f'{year[0]}.{month[0]}.{day[0]} {times[0]}UTC_{year[-1]}.{month[-1]}.{day[-1]} {times[-1]}UTC'
-time_len = len(year)*len(month)*len(day)*len(times)
+        plt.close(fig)
+        fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/{predict_interval}h_vc.png')
 
 
-#동반구는 0~180, 서반구는 180~360y
-lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(110,160,5,45)  
-
-pres=500                                            #살펴볼 기압면 결정
-p=pres_list.index(str(pres))
-
-
-fig, axs = plt.subplots(1, 2, figsize=(10*latlon_ratio*4, 10*2), subplot_kw={'projection': proj})
-for predict_interval in predict_interval_list:
-
-
-    # 위경도 범위 설정
-    lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(110, 160, 5, 45)
-    lon_grid, lat_grid = np.meshgrid(lon_indices[lon_start:lon_end + 1], lat_indices[lat_start:lat_end + 1])
-
-    # 최저값 위치를 저장할 리스트
-    # min_position = []
-
-    # input_data_dir = rf'{pangu_dir}/input_data/{time_str_input}'
-    # surface = np.load(os.path.join(input_data_dir, 'surface.npy')).astype(np.float32)[time_step::time_len]  
-    # upper = np.load(os.path.join(input_data_dir, 'upper.npy')).astype(np.float32)[time_step::time_len]  
-
-
-    # fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
-    # mslp = surface[surface_dict['MSLP']][lat_start:lat_end + 1, lon_start:lon_end + 1]
-    # ax.set_title(f'{time_str} (+0h)', fontsize=20)
-
-    # min_lon, min_lat = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, min_position)
-    # setup_map(ax)
-    # weather_map_contour(ax, lon_grid, lat_grid, mslp)
-
-
-    # u = upper[upper_dict['u'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]
-    # v = upper[upper_dict['v'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]
-    # z_850 = upper[upper_dict['z'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]/9.80665
-    # z_200 = upper[upper_dict['z'],9,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]/9.80665
-    # z_diff = z_200-z_850
-
-    # vorticity = calculate_vorticity(u, v, lat_grid, lon_grid)
-
-    # # contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4,10**-4,21),extend='both')
-    # contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet')
-    # # Add a colorbar
-    # cbar = plt.colorbar(contourf, ax=ax, orientation='vertical', extend='both')
-    # cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
-    # cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
-
-    # plt.show()
-
-    min_position = []
-
-    for y, m, d, tm in itertools.product(year, month, day, times):
-        # time_str = generate_time_str(time_step)
-        # print(time_str)
-        time_str = f'{y}/{m}/{d}/{tm}UTC'
-
-        ax = axs.flatten()[time_step]
-        
-        time_obj = datetime.strptime(time_str, "%Y.%m.%d %HUTC")
-        predict_time = time_obj + timedelta(hours=int(predict_interval))
-        predict_str = predict_time.strftime("%Y.%m.%d %HUTC")
-        # print(predict_str)
-
-        if predict_str == pred_str:
-            # fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
-            output_data_dir = rf'{pangu_dir}/output_data/{time_str}'
-            
-            # Load surface data
-            surface = np.load(os.path.join(output_data_dir, rf'surface/{predict_interval}h.npy')).astype(np.float32)
-            upper = np.load(os.path.join(output_data_dir, rf'upper/{predict_interval}h.npy')).astype(np.float32) 
-            mslp = surface[surface_dict['MSLP']][lat_start:lat_end + 1, lon_start:lon_end + 1]
-            u = upper[upper_dict['u'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]
-            v = upper[upper_dict['v'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]
-            vorticity = calculate_vorticity(u, v, lat_grid, lon_grid)
-
-            z_850 = upper[upper_dict['z'],2,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]/9.80665
-            z_200 = upper[upper_dict['z'],9,:,:][lat_start:lat_end + 1, lon_start:lon_end + 1]/9.80665
-            z_diff = z_200-z_850
-
-            ax.set_title(f'{time_str} (+{predict_interval}h)/npredict: {predict_str}', fontsize=20)
-
-            min_lon, min_lat = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, min_position)
-            setup_map(ax)
-            weather_map_contour(ax, lon_grid, lat_grid, mslp)
-
-            # contourf = ax.contourf(lon_grid, lat_grid, vorticity, cmap='seismic', levels = np.linspace(-10**-4,10**-4,21),extend='both')
-            contourf = ax.contourf(lon_grid, lat_grid, z_diff, cmap='jet')
-            # Add a colorbar
-            cbar = plt.colorbar(contourf, ax=ax, orientation='vertical', extend='both')
-            # cbar.set_label('Vorticity', fontsize=16)  # You can customize the label here
-            cbar.set_label('200-850hPa Thickness(m)', fontsize=16)  # You can customize the label here
-
-
-            # 저장된 최저값 위치에 마커 추가 및 선으로 연결
-            for i,(lon, lat) in enumerate(min_position):
-                if i==(np.size(min_position)/2-1):
-                    ax.scatter(lon, lat, color='blue', transform=proj, marker='x', s=40)
-                    ax.scatter(lon, lat, color='blue', transform=proj, facecolors='none', marker = 'o', s=40)
-                    
-                else:
-                    ax.scatter(lon, lat, color='blue', transform=proj)
-
-            # 선으로 연결
-            if len(min_position) > 1:
-                lons, lats = zip(*min_position)
-                ax.plot(lons, lats, color='red', transform=proj, linestyle='-', marker='')
-            
-            # plt.show()
     
     
     
     
-
-#%%
-min_position
 

@@ -55,15 +55,19 @@ time_str, predict_interval을 조정하여 초기장 시각과 예측 시간(1,3
 ## plotting.py
 time_str, predict_interval_list을 조정하여 초기장 시각과 예측 시간 리스트 조정  
 latlon_extent(0,360,-90,90)에서 살펴볼 위경도 범위 조정  
-pres로 기압면 결정정  
-***wind vector map 범례 표시 위치가 이상하게 표기됨 어떻게 해결해야할지??***
+pres로 기압면 결정
 
-
-
-
-      
 이미지 예시
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/9dbac0d2-23b2-4d7e-9871-b21830442bb4)
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/f3971dc9-caa8-4c04-a992-e6dac09571b3)
+
+
+## typhoon.py
+태풍 시작 위치와 시각을 입력하면 자동으로 추적
+**현재 육상에 올라가면 정확한 위치 추적 힘듦**
+![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f)
+
+
+      
 
 

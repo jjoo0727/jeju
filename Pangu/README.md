@@ -63,7 +63,7 @@ pres로 기압면 결정
 
 
 ## typhoon.py
-태풍 시작 위치와 시각을 입력하면 자동으로 추적
+태풍 시작 위치와 시각을 입력하면 자동으로 추적  
 **현재 육상에 올라가면 정확한 위치 추적 힘듦**
 ![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f)
 

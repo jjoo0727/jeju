@@ -63,7 +63,35 @@ pres로 기압면 결정
 
 
 ## typhoon.py
-태풍 시작 위치와 시각을 입력하면 자동으로 추적  
+태풍 시작 위치와 시각을 입력하면 자동으로 추적
+
+```
+wind_mask = wind_speed > 10
+expanded_wind_mask = binary_dilation(wind_mask, structure=np.ones((5, 5)))
+```
+wind_mask는 지상풍 10m/s 이상인 지역만,  
+expanded_wind_mask는 wind_mask 주변 2픽셀까지 포함
+
+
+```
+if len(min_position) < 1:
+  data_copy[(lat_grid > (init_pos[0]+init_size))|(lat_grid < (init_pos[0]-init_size))] = np.nan   
+  data_copy[(lon_grid > (init_pos[1]+init_size-180))|(lon_grid < (init_pos[1]-init_size-180))] = np.nan 
+```
+처음 찾을 때 init_pos(첫 위도, 첫 경도) 주변을 제외하 모두 마스킹
+
+```
+dv_dx = np.empty_like(v)
+dv_dx[:, 1:-1] = (v[:, 2:] - v[:, :-2]) / (2 * delta_lon[:, 1:-1])
+dv_dx[:, 0] = dv_dx[:, -1] = np.nan
+
+du_dy = np.empty_like(u)
+du_dy[1:-1, :] = (u[:-2, :] - u[2:, :]) / (2 * delta_lat[1:-1, :])
+du_dy[0, :] = du_dy[-1, :] = np.nan
+```
+vorticity 구할 때 lat가 내림차순으로 배치되어 있으므로  
+du_dy를 거꾸로 연산해야 원하는 값이 도출됨됨
+
 **현재 육상에 올라가면 정확한 위치 추적 힘듦**
 ![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f)
 

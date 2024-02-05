@@ -82,7 +82,7 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
     
     #태풍 발생 시점 이전엔 찾기 X
     if pred_str < init_str:
-        return np.nan, np.nan, min_position
+        return min_position
     
 
     # 데이터의 복사본 생성 및 마스킹
@@ -115,10 +115,8 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
         min_lat = lat_indices[lat_start + min_index[0]]
         min_lon = lon_indices[lon_start + min_index[1]]
         min_position.append([min_lon, min_lat, min_index, pred_str.strftime("%Y/%m/%d/%HUTC"), min_value])
-
-
-    ax.text(min_lon, min_lat, f'{min_value/100:.0f}hPa', transform=ax.projection, color='red', 
-            horizontalalignment='center', verticalalignment='bottom', fontsize=20, fontweight='bold')
+        ax.text(min_lon, min_lat, f'{min_value/100:.0f}hPa', transform=ax.projection, color='red', 
+                horizontalalignment='center', verticalalignment='bottom', fontsize=20, fontweight='bold')
     
     norm_p = mcolors.Normalize(vmin=950, vmax=1020)
     
@@ -146,7 +144,7 @@ def plot_min_value(ax, data, lat_indices, lon_indices, lat_start, lon_start, lat
     min_p = ax.scatter(lons, lats, c=min_values, cmap='jet_r', norm=norm_p, transform=proj, zorder=2)
     cbar_min_p = plt.colorbar(min_p, orientation='horizontal', fraction=0.046, pad=0.07)
     cbar_min_p.set_label('Minimum Pressure(hPa)', fontsize=16)
-    return min_lon, min_lat, min_position
+    return min_position
 
 #ax 배경 지정
 def setup_map(ax):
@@ -214,18 +212,18 @@ upper_dict = {'z':0, 'q':1, 't':2, 'u':3, 'v':4}
 
 predict_interval_list = np.arange(0,24*7+1,6)[1:]   #볼 예측 시간 지정
 # time_str = '2020/08/26/00UTC'                       #time_str 지정
-year = ['2023']
-month = ['07']
-day = ['26','27','28']
+year = ['2020']
+month = ['08']
+day = ['28']
 times = ['00','06','12','18']
-init_str = '2023/07/27/06UTC'                       #태풍 시점
-# init_pos = [16.93, 130.16]                          #태풍 첫 위경도
-init_pos = [14.06, 135.71]                          #태풍 첫 위경도
+init_str = '2020/08/28/06UTC'                       #태풍 시점
+init_pos = [16.93, 130.16]                          #태풍 첫 위경도
+# init_pos = [14.06, 135.71]                          #태풍 첫 위경도
 
 
 for y, m, d, tm in itertools.product(year, month, day, times):
-    print(time_str)
     time_str = f'{y}/{m}/{d}/{tm}UTC'
+    print(time_str)
     input_data_dir = rf'{pangu_dir}/input_data/{time_str}'
 
 
@@ -243,7 +241,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     
     fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
     ax.set_title(f'{time_str} Surface (+0h)', fontsize=20)
-    min_lon, min_lat, min_position = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, lon_grid,
+    min_position = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, lon_grid,
                                                     wind_speed, predict_str, init_str, init_pos, min_position)
     setup_map(ax)
     weather_map_contour(ax, lon_grid, lat_grid, mslp)
@@ -277,7 +275,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         
         fig, ax = plt.subplots(1, 1, figsize=(10*latlon_ratio, 10), subplot_kw={'projection': proj})
         ax.set_title(f'{time_str} (+{predict_interval}h)  predict: {predict_str}', fontsize=20)
-        min_lon, min_lat, min_position = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, lon_grid,
+        min_position = plot_min_value(ax, mslp, lat_indices, lon_indices, lat_start, lon_start, lat_grid, lon_grid,
                                                         wind_speed, predict_str, init_str, init_pos, min_position)
         setup_map(ax)
         weather_map_contour(ax, lon_grid, lat_grid, mslp)

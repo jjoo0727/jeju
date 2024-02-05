@@ -96,8 +96,11 @@ du_dy[0, :] = du_dy[-1, :] = np.nan
 ![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/5a56867b-60a6-4ab7-9a98-0bfc666e5365)
 ![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f)
 
-**현재 육상에 올라가면 정확한 위치 추적 힘듦**
+**현재 육상에 올라가면 정확한 위치 추적 힘듦**  
 
+  
+
+WMO 기준 35knot를 넘는 순간부터 추적
 ```python
 def storm_info(storm_name, storm_year):
     ibtracs = tracks.TrackDataset(basin='all',source='ibtracs',ibtracs_mode='jtwc_neumann',catarina=True)
@@ -110,7 +113,8 @@ def storm_info(storm_name, storm_year):
     storm_time = storm['time'][first_index:]
     return storm_lon, storm_lat, storm_mslp, storm_time
 '''
-WMO 기준 35knot를 넘는 순간부터 추적
+
+
 
 
 

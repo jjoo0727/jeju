@@ -98,10 +98,23 @@ du_dy[0, :] = du_dy[-1, :] = np.nan
 
 **현재 육상에 올라가면 정확한 위치 추적 힘듦**
 
-ㅁㄴㅇㄻ|ㅁㄴㅇㄻㄴㅇㄹ|
-ㅁㄴㅇㄻ|ㅁㄴㅇㄻㄴㅇㄹ|
-![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/5a56867b-60a6-4ab7-9a98-0bfc666e5365) | ![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f
----|---|
+```python
+def storm_info(storm_name, storm_year):
+    ibtracs = tracks.TrackDataset(basin='all',source='ibtracs',ibtracs_mode='jtwc_neumann',catarina=True)
+    storm = ibtracs.get_storm((storm_name,storm_year))
+    storm.to_dataframe()
+    first_index = np.where((storm['wmo_vmax']>=35) == True)[0][0]
+    storm_lon = storm['lon'][first_index:]-180
+    storm_lat = storm['lat'][first_index:]
+    storm_mslp = storm['mslp'][first_index:]
+    storm_time = storm['time'][first_index:]
+    return storm_lon, storm_lat, storm_mslp, storm_time
+'''
+WMO 기준 35knot를 넘는 순간부터 추적
+
+![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/5a56867b-60a6-4ab7-9a98-0bfc666e5365) 
+![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f
+
 
       
 

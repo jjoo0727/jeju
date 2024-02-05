@@ -112,8 +112,6 @@ def storm_info(storm_name, storm_year):
 '''
 WMO 기준 35knot를 넘는 순간부터 추적
 
-![image](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/5a56867b-60a6-4ab7-9a98-0bfc666e5365) 
-![168h](https://github.com/jjoo0727/Convective-Systems-Tropical-Dynamics-Laboratory/assets/63052158/795f36a4-557e-46b2-a21b-df3117861a7f
 
 
       

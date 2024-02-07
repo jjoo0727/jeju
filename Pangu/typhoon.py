@@ -448,7 +448,7 @@ ax.set_ylabel("Distance (km)")
 # 범례 표시
 ax.legend()
 plt.tight_layout()
-
+fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/dis_error.png', bbox_inches='tight')
 # 표시
 plt.show()
 

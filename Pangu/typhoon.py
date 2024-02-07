@@ -260,29 +260,31 @@ lat_start, lat_end, lon_start, lon_end, extent, latlon_ratio = latlon_extent(100
 lon_grid, lat_grid = np.meshgrid(lon_indices[lon_start:lon_end + 1], lat_indices[lat_start:lat_end + 1])
 
 #태풍 지정
-storm_name = 'Khanun'
+storm_name = 'hinnamnor'                                                                               
 storm_name = storm_name.upper()
-storm_year = 2023
+storm_year = 2022
 storm_lon, storm_lat, storm_mslp, storm_time = storm_info(storm_name, storm_year)   #태풍 영문명, 년도 입력
 
 #예측 시간 지정
 predict_interval_list = np.arange(0,24*7+1,6)[1:]     
-year = ['2023']
-month = ['07']
+year = ['2022']
+month = ['08']
 day = ['26','27','28']
-times = ['00','06','12','18']
+times = ['00','12']
 
 dis_dic = {}
 
 for y, m, d, tm in itertools.product(year, month, day, times):
     #ERA5 initial map
     time_str = f'{y}/{m}/{d}/{tm}UTC'
+    save_str = f'{y}_{storm_name}/{m}/{d}/{tm}UTC'
     time_obj = datetime.strptime(time_str, "%Y/%m/%d/%HUTC")
     print(time_str)
     input_data_dir = rf'{pangu_dir}/input_data/{time_str}'
     
     min_position = []  # 최저값 위치를 저장할 리스트
     dis_dic[time_obj] = {}
+
 
     predict_str = time_str
     surface = np.load(os.path.join(input_data_dir, 'surface.npy')).astype(np.float32)  
@@ -299,12 +301,12 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     weather_map_contour(ax, lon_grid, lat_grid, mslp)
 
 
-    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{time_str}/vorticity'):
-        os.makedirs(f'{pangu_dir}/plot/typhoon/{time_str}/vorticity')
-    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{time_str}/z_200-z_850'):
-        os.makedirs(f'{pangu_dir}/plot/typhoon/{time_str}/z_200-z_850')
-    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{time_str}/z_500'):
-        os.makedirs(f'{pangu_dir}/plot/typhoon/{time_str}/z_500')
+    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{save_str}/vorticity'):
+        os.makedirs(f'{pangu_dir}/plot/typhoon/{save_str}/vorticity')
+    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{save_str}/z_200-z_850'):
+        os.makedirs(f'{pangu_dir}/plot/typhoon/{save_str}/z_200-z_850')
+    if not os.path.exists(f'{pangu_dir}/plot/typhoon/{save_str}/z_500'):
+        os.makedirs(f'{pangu_dir}/plot/typhoon/{save_str}/z_500')
     # if not os.path.exists(f'{pangu_dir}/plot/typhoon/{time_str}/s_500'):
     #     os.makedirs(f'{pangu_dir}/plot/typhoon/{time_str}/s_500')
         
@@ -316,7 +318,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     ax.set_title(f'850hPa Vorticity\n{storm_name}', fontsize=20, loc = 'right')
     if min_position:
         ax.set_title(f'850hPa Vorticity\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-    fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/vorticity/0h.png', bbox_inches='tight')
+    fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/vorticity/0h.png', bbox_inches='tight')
     cbar.remove()  # colorbar 제거
     contourf.remove()
     
@@ -329,7 +331,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     ax.set_title(f'200-850hPa Thickness\n{storm_name}', fontsize=20, loc = 'right')
     if min_position:
         ax.set_title(f'200-850hPa Thickness\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-    fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/z_200-z_850/0h.png', bbox_inches='tight')
+    fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/z_200-z_850/0h.png', bbox_inches='tight')
     cbar.remove()  # colorbar 제거
     contourf.remove()
     
@@ -341,7 +343,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
     ax.set_title(f'500hPa Height\n{storm_name}', fontsize=20, loc = 'right')
     if min_position:
         ax.set_title(f'500hPa Height\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-    fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/z_500/0h.png', bbox_inches='tight')
+    fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/z_500/0h.png', bbox_inches='tight')
     cbar.remove()  # colorbar 제거
     contourf.remove()
         
@@ -384,7 +386,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         ax.set_title(f'850hPa Vorticity\n{storm_name}', fontsize=20, loc = 'right')
         if min_position:
             ax.set_title(f'850hPa Vorticity\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-        fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/vorticity/{predict_interval}h.png', bbox_inches='tight')
+        fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/vorticity/{predict_interval}h.png', bbox_inches='tight')
         cbar.remove()  # colorbar 제거
         contourf.remove()
         
@@ -396,7 +398,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         ax.set_title(f'200-850hPa Thickness\n{storm_name}', fontsize=20, loc = 'right')
         if min_position:
             ax.set_title(f'200-850hPa Thickness\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-        fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/z_200-z_850/{predict_interval}h.png', bbox_inches='tight')
+        fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/z_200-z_850/{predict_interval}h.png', bbox_inches='tight')
         cbar.remove()  # colorbar 제거
         contourf.remove()
 
@@ -409,7 +411,7 @@ for y, m, d, tm in itertools.product(year, month, day, times):
         ax.set_title(f'500hPa Height\n{storm_name}', fontsize=20, loc = 'right')
         if min_position:
             ax.set_title(f'500hPa Height\n{storm_name} ({min_position[-1][4]/100:.0f}hPa)', fontsize=20, loc = 'right')
-        fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/z_500/{predict_interval}h.png', bbox_inches='tight')
+        fig.savefig(f'{pangu_dir}/plot/typhoon/{save_str}/z_500/{predict_interval}h.png', bbox_inches='tight')
         cbar.remove()  # colorbar 제거
         contourf.remove()
 
@@ -446,9 +448,13 @@ ax.xaxis.set_major_formatter(date_form)
 ax.set_ylabel("Distance (km)")
 
 # 범례 표시
-ax.legend()
+ax.legend(loc = 'upper left')
 plt.tight_layout()
-fig.savefig(f'{pangu_dir}/plot/typhoon/{time_str}/dis_error.png', bbox_inches='tight')
+first_element = save_str.split('/')[0]
+fig.savefig(f'{pangu_dir}/plot/typhoon/{first_element}/dis_error.png', bbox_inches='tight')
 # 표시
 plt.show()
 
+
+#%%
+min_position

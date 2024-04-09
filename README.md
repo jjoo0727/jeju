@@ -1,2 +1,2 @@
-# Convective-Systems-Tropical-Dynamics-Laboratory
-SNU Convective Systems/Tropical Dynamics Laboratory code
+# My own code repository
+
